@@ -18,6 +18,9 @@
     "assets",
     "assets path"
   ],
+  "peerDependencies": {
+    "html-webpack-plugin": "^4.3.0"
+  },
   "author": "lkiarest",
   "license": "MIT",
   "bugs": {

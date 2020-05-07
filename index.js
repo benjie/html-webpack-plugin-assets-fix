@@ -3,6 +3,8 @@
  * fix reference of js/css when build multi-entry files
  */
 
+const HtmlWebpackPlugin = require('html-webpack-plugin')
+
 function HtmlWebpackPluginAssetsFix(options) {
     options = options || {}
     this.fixAssets = options.fixAssets
@@ -61,10 +63,10 @@ function fixPath(assetPath, htmlPath) {
 HtmlWebpackPluginAssetsFix.prototype.apply = function(compiler) {
     const self = this
 
-    compiler.plugin('compilation', function(compilation) {
-        compilation.plugin('html-webpack-plugin-before-html-processing', function(htmlPluginData, possiblyCallback) {
+    compiler.hooks.compilation.tap('html-webpack-plugin-assets-fix', compilation => {
+        HtmlWebpackPlugin.getHooks(compilation).beforeAssetTagGeneration.tap('html-webpack-plugin-assets-fix', htmlPluginData => {
             const promise = new Promise((resolve, reject) => {
-                const callback = possiblyCallback || ((err, res) => err ? reject(err) : resolve(res));
+                const callback = ((err, res) => err ? reject(err) : resolve(res));
                 if (!self.fixAssets) {
                     callback(null, htmlPluginData)
                     return;
@@ -84,7 +86,7 @@ HtmlWebpackPluginAssetsFix.prototype.apply = function(compiler) {
 
                 callback(null, htmlPluginData)
             });
-            return possiblyCallback ? undefined : promise;
+            return promise;
         })
     })
 }
